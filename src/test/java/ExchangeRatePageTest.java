@@ -10,7 +10,7 @@ public class ExchangeRatePageTest {
 
     @Before
     public void init() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\Эвелина\\Desktop\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "..\\config\\chromedriver.exe");
         Configuration.browser = "chrome";
         Configuration.timeout=10000;
         open("https://www.tinkoff.ru/about/exchange/");
