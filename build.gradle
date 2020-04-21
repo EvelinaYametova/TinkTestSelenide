@@ -28,10 +28,12 @@ repositories {
 
 dependencies {
     compile 'com.codeborne:selenide:5.10.0'
-    testCompile 'io.rest-assured:json-schema-validator:4.3.0'
-    testCompile 'io.rest-assured:xml-path:4.3.0'
-    testCompile 'io.rest-assured:json-path:4.3.0'
-    testCompile 'io.rest-assured:rest-assured:4.3.0'
+
+    compile 'io.rest-assured:json-schema-validator:4.3.0'
+    compile 'io.rest-assured:xml-path:4.3.0'
+    compile 'io.rest-assured:json-path:4.3.0'
+    compile 'io.rest-assured:rest-assured:4.3.0'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.11.1'
     implementation 'com.google.code.gson:gson:2.8.6'

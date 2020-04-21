@@ -1,46 +1,49 @@
-import io.qameta.allure.junit4.DisplayName;
+import com.google.gson.Gson;
+import io.qameta.allure.Step;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
-import org.junit.jupiter.api.Order;
+import static org.junit.jupiter.api.Assertions.*;
+import json.*;
 
+
+import java.text.ParseException;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 public class ApiTest {
+    private static final String PATH = "https://www.cbr-xml-daily.ru/daily_json.js";
+    private Response response = RestAssured.get(PATH);
+
     @Test
-    @Order(1)
+    public void testApi() throws ParseException {
+        OK200Test();
+        headerTest();
+        isValidate();
+        dateTimestampCorrect();
+    }
+
+    @Step("Запрос к АПИ ЦБ выполнился с кодом 200")
      public void OK200Test() {//12
-        RestAssured.get("https://www.cbr-xml-daily.ru/daily_json.js")
-                .then()
-                .statusCode(HttpStatus.SC_OK);
+        response.then().statusCode(HttpStatus.SC_OK);
     }
 
-    @Test
-    @Order(2)
+    @Step("Заголовок Content-Type соотвествует действительности")
     public void headerTest() {//13
-        RestAssured.get("https://www.cbr-xml-daily.ru/daily_json.js")
-                .then()
-                .header("Content-Type","application/javascript; charset=utf-8");
+        response.then().contentType(ContentType.JSON);
     }
 
-    @Test
-    @Order(3)
+    @Step("В ответе точно содержатся объекты \"USD\" и \"EUR\"")
     public void isValidate() {//14
-        RestAssured.get("https://www.cbr-xml-daily.ru/daily_json.js")
-                .then()
-                .body(matchesJsonSchemaInClasspath("schema.json"));
-
+        response.then().body(matchesJsonSchemaInClasspath("schema.json"));
     }
 
-    @Test
-    @Order(4)
-    public void dateTimestampCorrect() {//15  D
-        RestAssured.get("https://www.cbr-xml-daily.ru/daily_json.js")
-                .then()
-                .body("Date", equalTo("2020-04-14T11:30:00+03:00"))
-                .and()
-                .body("Timestamp", equalTo("2020-04-13T14:00:00+03:00"));
+    @Step("В \"Date\" отображается поздняя дата, в \"Timestamp\" - ранняя")
+    public void dateTimestampCorrect() throws ParseException {//15
+        String str = response.asString();
+        ExchangeData exchangeData = new Gson().fromJson(str, ExchangeData.class);
+        assertTrue(exchangeData.getDate().after(exchangeData.getTimestamp()));
     }
 }
